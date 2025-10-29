@@ -72,3 +72,6 @@ tool_test_output.json
 
 # VScode configuration
 .vscode
+
+# Stop the idea folder tracking.
+.idea/
