@@ -108,7 +108,7 @@ Arguments:
             Show this help message and exit  
 
 --name                      
-            Name of the protein, in text format
+            Name of the protein, in text format. When using a FASTA file, this argument is optional as the name will be derived from the FASTA header and will be ignored when the FASTA contains multiple sequences
 
 --sequence                       
             Sequence to be processed, in text format
