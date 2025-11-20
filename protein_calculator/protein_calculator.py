@@ -14,8 +14,31 @@ from Sequence_functions import normalize_sequence, check_protein_sequence, forma
 from references import amino_acid_data
 from jinja2 import Environment, FileSystemLoader
 import base64
+import requests
+import datetime
 
 VERSION = '1.0.2'
+
+# API endpoint of Galaxy BE's version
+url = "https://usegalaxy.be/api/version"
+
+# Make a GET request
+response = requests.get(url, headers={"accept": "application/json"})
+
+# Check if request was successful
+if response.status_code == 200:
+    # Parse the JSON response
+    galaxy_version = response.json().get("version_major", "Unknown Galaxy Version")
+    print(f"Galaxy Version: {galaxy_version}")
+else:
+    print(f"Failed to fetch Galaxy BE version. HTTP Status Code: {response.status_code}")
+    galaxy_version = "Unknown"
+
+# Get current timestamp
+time_of_invocation = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+# Debug print statement
+print(f"Time of Invocation: {time_of_invocation}")
 
 def main():
     parser = argparse.ArgumentParser(description='Process some sequences.')
