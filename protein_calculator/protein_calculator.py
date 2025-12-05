@@ -16,12 +16,13 @@ from jinja2 import Environment, FileSystemLoader
 import base64
 import os
 
+# Tool version 
 VERSION = '1.0.3'
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Process a protein sequence or FASTA file.')
 
-    # Definitie van de argumenten
+    # define command line arguments
     parser.add_argument('--sequence', type=str, required=True,
                         help='Protein sequence or path to a FASTA file')
 
@@ -69,8 +70,9 @@ def main():
             name = fasta_name
 
         print(f"Processing: {name}")
-
+        # normalize sequence to remove whitespaces and convert to uppercase
         sequence = normalize_sequence(sequence)
+        # check for invalid characters in the sequence
         error_message = check_protein_sequence(sequence)
         if error_message:
             print(f"Error in {name}: {error_message}")
@@ -78,6 +80,7 @@ def main():
 
         sequence_formatted = format_sequence(sequence, show_residue_number=True, line_length=55)
 
+        # Calculations of protein properties
         frequency = letter_count(sequence)
         amino_acid_composition = []
         total_monoisotopic_mass = 18.0152
@@ -106,6 +109,7 @@ def main():
 
         number_info = {'number': total_count}
 
+        # Clean up of total_monoisotopic_mass and total_average_mass numbers for better readability
         if total_monoisotopic_mass > 9999:
             temp_str = f"{total_monoisotopic_mass:,.2f}"
             rounded_total_monoisotopic_mass = temp_str.replace(",", " ")
@@ -146,27 +150,57 @@ def main():
             pH_values.append(pH)
             net_charges.append(net_charge)
 
+        # Plotly Titration Curve
         df = pd.DataFrame({"pH": pH_values, "Net Charges": net_charges})
         colors = ['#3ABBBA', '#5A2A82', '#FF681E']
         titration_curve = px.line(df, x="pH", y="Net Charges", color_discrete_sequence=colors)
         titration_curve.update_layout(title_text="Titration Curve", title_x=0.5)
 
+        # write the interactive plot to an HTML file
+        file_path = "plot.html"
+        titration_curve.write_html(file_path)
+
+        # ensure the file starts with <!DOCTYPE html>, as otherwise Galaxy will not render it as an HTML file
+        with open(file_path, "r", encoding="utf-8") as file:
+            html_content = file.read()
+
+        # add <!DOCTYPE html> at the beginning if it's missing
+        if not html_content.lstrip().startswith("<!DOCTYPE html>"):
+            html_content = f"<!DOCTYPE html>\n{html_content}"
+
+        # overwrite the file with the updated content
+        with open(file_path, "w", encoding="utf-8") as file:
+            file.write(html_content)
+
         file_prefix = name.replace(" ", "_")
-        html_file = f"{file_prefix}_report.html"
-        png_file = f"{file_prefix}_plot.png"
-        json_file = f"{file_prefix}_titration.json"
+        html_report = f"{file_prefix}_report.html"
+        png_plot = f"{file_prefix}_plot.png"
+        html_plot = f"{file_prefix}_interactive_plot.html"
 
-        titration_curve.write_html(html_file)
-        titration_curve.write_image(png_file, format="png")
+        # save the titration curve as a PNG image and interactive html plot
+        titration_curve.write_image(png_plot, format="png")
+        titration_curve.write_html(html_plot)
 
-        with open(png_file, "rb") as png_file_obj:
+        # convert the PNG file to a Base64 string which is more convenient to embed in HTML in this case
+        with open(png_plot, "rb") as png_file_obj:
             titration_png_base64 = base64.b64encode(png_file_obj.read()).decode("utf-8")
 
+        # convert titration object to a json string
         titration_json = dumps(titration_curve, cls=utils.PlotlyJSONEncoder)
+        # calculate dn/dc value
         dn_dc_value = round(calculate_dn_dc(sequence, amino_acid_data), 6)
 
+        #############################
+        #  Render HTML using Jinja2 #
+        #############################
+
+        # Set up the Jinja2 environment
         env = Environment(loader=FileSystemLoader('templates'))
+
+        # Load the results.html template
         template = env.get_template('results.html')
+
+        # Data to render in the template
         data = {
             "name": name,
             "sequence": sequence_formatted,
@@ -184,10 +218,10 @@ def main():
         }
 
         output = template.render(data)
-        with open(html_file, 'w', encoding="utf-8") as f:
+        with open(html_report, 'w', encoding="utf-8") as f:
             f.write(output)
 
-        # Print Results
+        # Print Results as standard output for extra logging and easier debugging
         print(f'Name: {name}')
         print(f'Sequence: {sequence_formatted}')
         print(f'Amino Acid Composition:')
@@ -203,7 +237,9 @@ def main():
         print(f'Titration Curve JSON: {titration_json}')
         print(f'dn/dc Value: {dn_dc_value}')
 
-        print(f"HTML rendered and saved to {html_file}")
+        print(f"HTML report rendered and saved to {html_report}")
+        print(f"PNG plot rendered and saved to {png_plot}")
+        print(f"Interactive plot rendered and saved to {html_plot}")
 
 if __name__ == '__main__':
     main()
