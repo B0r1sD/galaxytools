@@ -158,22 +158,7 @@ def main():
         titration_curve = px.line(df, x="pH", y="Net Charges", color_discrete_sequence=colors)
         titration_curve.update_layout(title_text="Titration Curve", title_x=0.5)
 
-        # write the interactive plot to an HTML file
-        file_path = "plot.html"
-        titration_curve.write_html(file_path)
-
-        # ensure the file starts with <!DOCTYPE html>, as otherwise Galaxy will not render it as an HTML file
-        with open(file_path, "r", encoding="utf-8") as file:
-            html_content = file.read()
-
-        # add <!DOCTYPE html> at the beginning if it's missing
-        if not html_content.lstrip().startswith("<!DOCTYPE html>"):
-            html_content = f"<!DOCTYPE html>\n{html_content}"
-
-        # overwrite the file with the updated content
-        with open(file_path, "w", encoding="utf-8") as file:
-            file.write(html_content)
-
+        # define file output names
         file_prefix = name.replace(" ", "_")
         html_report = f"{file_prefix}_report.html"
         png_plot = f"{file_prefix}_plot.png"
@@ -182,6 +167,18 @@ def main():
         # save the titration curve as a PNG image and interactive html plot
         titration_curve.write_image(png_plot, format="png")
         titration_curve.write_html(html_plot)
+
+        # ensure the html plot file starts with <!DOCTYPE html>, as otherwise Galaxy will not render it as an HTML file
+        with open(html_plot, "r", encoding="utf-8") as file:
+            html_content = file.read()
+
+        # add <!DOCTYPE html> at the beginning if it's missing
+        if not html_content.lstrip().startswith("<!DOCTYPE html>"):
+            html_content = f"<!DOCTYPE html>\n{html_content}"
+
+        # overwrite the file with the updated content
+        with open(html_plot, "w", encoding="utf-8") as file:
+            file.write(html_content)
 
         # convert the PNG file to a Base64 string which is more convenient to embed in HTML in this case
         with open(png_plot, "rb") as png_file_obj:

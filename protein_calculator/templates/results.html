@@ -51,8 +51,11 @@
         <button type="submit">Go to Export View</button>
     </form> -->
 
-    <!--  Save as XLS -->
-    <button id="savePageButton">Save Page</button>
+    <!--  Save as HTML -->
+    <button id="savePageButtonHTML">Save Page in HTML</button>
+
+    <!--  Save as CSV to be compatible with spreadsheet programs such as Excel -->
+    <button id="savePageButtonCSV">Save Page in CSV</button>
 
     <h2>Protein Information</h2>
 
@@ -60,7 +63,7 @@
     <p><strong>Amino Acid Sequence:</strong></p>
     <pre>{{ sequence }}</pre>
 
-    <p><strong>Unformated Amino Acid Sequence:</strong></p>
+    <p><strong>Unformatted Amino Acid Sequence:</strong></p>
     <pre>{{ sequence2 }}</pre>
 
     <h2>Amino Acid Composition</h2>
@@ -111,7 +114,7 @@
     <h2>Molar Absorbance</h2>
         <table border="1">
             <tr>
-                <th colspan="2">Extinction coefficient at 280 nm &nbsp;&nbsp;<span style="font-size:0.6em; color:gray;"><span style="display: inline-block; text-align: center;">1<br>─────<br>(M*cm)</span></span></th>
+                <th colspan="2" data-csv="Extinction coefficient at 280 nm (1/(M*cm))">Extinction coefficient at 280 nm &nbsp;&nbsp;<span style="font-size:0.6em; color:gray;"><span style="display: inline-block; text-align: center;">1<br>─────<br>(M*cm)</span></span></th>
             </tr>
             <tr>
                 <td>Cystines</td>
@@ -125,7 +128,7 @@
         <br>
         <table border="1">
             <tr>
-                <th colspan="2">Absorbance 0.1% &nbsp;&nbsp;<span style="font-size:0.6em; color:gray;"><span style="display: inline-block; text-align: center;">1<br>─────────<br>ml/(mg*cm)</span></span></th>
+                <th colspan="2" data-csv="Absorbance 0.1% (1/ml(mg*cm))">Absorbance 0.1% &nbsp;&nbsp;<span style="font-size:0.6em; color:gray;"><span style="display: inline-block; text-align: center;">1<br>─────────<br>ml/(mg*cm)</span></span></th>
                 <th>Notes</th>
             </tr>
             <tr>
@@ -193,7 +196,6 @@
                 <img src="data:image/png;base64,{{ titration_png_base64 }}" alt="Titration Curve was here" style="max-width: 100%" />
             </div>
         </div>
-        <p> An interactive titration curve (Plotly graph) can be found in your Galaxy history.</p>
     <h2>Calculated dn/dc Value</h2>
     <p>Calculated dn/dc value for the sequence: {{ dn_dc_value }}</p>
 <p> </p>
@@ -208,7 +210,7 @@
     var proteinName = "{{ name }}";
 </script>
 <script>
-    document.getElementById('savePageButton').addEventListener('click', function() {
+    document.getElementById('savePageButtonHTML').addEventListener('click', function() {
         var proteinName = "{{ name }}"; // Zorg ervoor dat deze variabele beschikbaar is
         var fileName = proteinName + ' - Protein Calculator Result.html';
 
@@ -216,6 +218,42 @@
         var htmlContent = document.documentElement.outerHTML.replace(/\./g, ',');
 
         var blob = new Blob([htmlContent], {type: 'text/html'});
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = fileName;
+        a.click();
+    });
+    document.getElementById('savePageButtonCSV').addEventListener('click', function() {
+        var proteinName = "{{ name }}"; // Ensure this variable is available
+        var fileName = proteinName + ' - Protein Calculator Result.csv';
+
+        // Initialize an array to store CSV rows
+        var rows = [];
+
+        // Process all relevant elements in the order they appear in the DOM
+        document.querySelectorAll('h1, h2, p, pre, table').forEach(function(element) {
+            if (element.tagName === 'TABLE') {
+                // Process table rows
+                element.querySelectorAll('tr').forEach(function(row) {
+                    var rowData = [];
+                    row.querySelectorAll('td, th').forEach(function(cell) {
+                        // Use the data-csv attribute if it exists, otherwise use the text content
+                        var cellContent = cell.getAttribute('data-csv') || cell.innerText.replace(/,/g, ''); // Remove commas to avoid CSV issues
+                        rowData.push(cellContent);
+                    });
+                    rows.push(rowData.join(',')); // Join cells with commas
+                });
+            } else {
+                // Process other elements (h1, h2, p, pre)
+                rows.push(element.innerText.replace(/,/g, '')); // Add the text content only
+            }
+        });
+
+        // Convert rows to CSV format
+        var csvContent = rows.join('\n');
+
+        // Create a Blob and trigger download
+        var blob = new Blob([csvContent], {type: 'text/csv'});
         var a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.download = fileName;
