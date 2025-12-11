@@ -93,6 +93,15 @@
             <output name="output2" file="plot.png" count="1"/>
             <output name="output3" file="plot.html" count="1"/>
         </test>
+        <test expect_num_outputs="3">
+            <conditional name="fasta_or_text">
+                <param name="input_mode" value="history"/>
+                <param name="sequence" value="test_multiple_proteins.fasta"/>
+            </conditional>
+            <output name="output1" file="protein1_report.html" count="2"/>
+            <output name="output2" file="protein1_plot.png" count="2"/>
+            <output name="output3" file="protein1_interactive_plot.html" count="2"/>
+        </test>
     </tests>
     <help><![CDATA[
 This Python-based tool will determine protein properties based on the amino acid sequence, which it summarizes in an HTML report and Plotly graph. 
