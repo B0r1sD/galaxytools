@@ -19,7 +19,7 @@ import datetime
 import os
 
 # Tool version 
-VERSION = '1.0.3'
+VERSION = '1.1.0'
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Process a protein sequence or FASTA file.')
