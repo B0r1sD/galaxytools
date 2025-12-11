@@ -61,27 +61,6 @@ def resolve_sequences(sequence_input):
     else:
         return [("input_sequence", sequence_input.upper())]
 
-# API endpoint of Galaxy BE's version
-url = "https://usegalaxy.be/api/version"
-
-# Make a GET request
-response = requests.get(url, headers={"accept": "application/json"})
-
-# Check if request was successful
-if response.status_code == 200:
-    # Parse the JSON response
-    galaxy_version = response.json().get("version_major", "Unknown Galaxy Version")
-    print(f"Galaxy Version: {galaxy_version}")
-else:
-    print(f"Failed to fetch Galaxy BE version. HTTP Status Code: {response.status_code}")
-    galaxy_version = "Unknown"
-
-# Get current timestamp
-time_of_invocation = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-# Debug print statement
-print(f"Time of Invocation: {time_of_invocation}")
-
 def main():
     args = parse_arguments()
     sequences = resolve_sequences(args.sequence)
@@ -213,6 +192,28 @@ def main():
         # calculate dn/dc value
         dn_dc_value = round(calculate_dn_dc(sequence, amino_acid_data), 6)
 
+        ################## extra metadata ##################
+        # API endpoint of Galaxy BE's version
+        url = "https://usegalaxy.be/api/version"
+
+        # Make a GET request
+        response = requests.get(url, headers={"accept": "application/json"})
+
+        # Check if request was successful
+        if response.status_code == 200:
+            # Parse the JSON response
+            galaxy_version = response.json().get("version_major", "Unknown Galaxy Version")
+            #print(f"Galaxy Version: {galaxy_version}")
+        else:
+            #print(f"Failed to fetch Galaxy BE version. HTTP Status Code: {response.status_code}")
+            galaxy_version = "Unknown"
+
+        # Get current timestamp
+        time_of_invocation = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        # Debug print statement
+        print(f"Time of Invocation: {time_of_invocation}")
+
         #############################
         #  Render HTML using Jinja2 #
         #############################
@@ -237,7 +238,10 @@ def main():
             "titration_json": titration_json,
             "titration_png_base64": titration_png_base64,
             "titration_curve": titration_curve,
-            "dn_dc_value": dn_dc_value
+            "dn_dc_value": dn_dc_value,
+            "galaxy_version": galaxy_version,
+            "time_of_invocation": time_of_invocation,
+            "VERSION": VERSION
         }
 
         output = template.render(data)

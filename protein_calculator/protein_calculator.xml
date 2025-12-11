@@ -1,4 +1,4 @@
-<tool id="protein_calculator" name="Protein Calculator" version="@TOOL_VERSION@+galaxy@VERSION_SUFFIX@" python_template_version="3.5" profile="22.05" license="MIT">
+<tool id="protein_calculator" name="Protein Calculator" version="@TOOL_VERSION@+galaxy@VERSION_SUFFIX@" python_template_version="3.5" profile="25.0" license="MIT">
     <description>by the VIB Protein Core</description>
     <macros>
         <token name="@TOOL_VERSION@">1.0.3</token>
@@ -17,12 +17,15 @@
         <requirement type="package" version="1.85">biopython</requirement>
         <requirement type="package" version="3.1.6">jinja2</requirement>
         <requirement type="package" version="0.2.1">python-kaleido</requirement>
+        <requirement type="package" version="2.32.3">requests</requirement>
+
     </requirements>
     <stdio>
         <regex match="invalid character" source="both" level="fatal" description="Protein sequence contains invalid character(s). Please enter a valid Protein Sequence."/>
         <regex match="DNA sequence" source="both" level="fatal" description="DNA sequence detected. Please enter a valid Protein Sequence."/>
         <regex match="minimum length" source="both" level="fatal" description="Protein sequence should have a minimum length of 10 residues. Please enter a valid Protein Sequence."/>
         <regex match="maximum allowed length" source="both" level="fatal" description="Protein sequence should have a maximum length of 3000 residues. Please enter a valid Protein Sequence."/>
+        <regex match="Failed to fetch" source="both" level="fatal" description="Failed to fetch Galaxy BE version. Please try again."/>
     </stdio>
     <version_command>python '$__tool_directory__/protein_calculator.py' --version</version_command>
     <command detect_errors="exit_code"><![CDATA[
@@ -79,7 +82,6 @@
             <output name="output1" file="crab_anapl_report.html" count="1"/>
             <output name="output2" file="crab_anapl_plot.png" count="1"/>
             <output name="output3" file="crab_anapl_interactive_plot.html" count="1"/>
-
         </test>
         <test expect_num_outputs="3">
             <conditional name="fasta_or_text">
