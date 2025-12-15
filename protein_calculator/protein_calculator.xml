@@ -25,7 +25,7 @@
         <regex match="DNA sequence" source="both" level="fatal" description="DNA sequence detected. Please enter a valid Protein Sequence."/>
         <regex match="minimum length" source="both" level="fatal" description="Protein sequence should have a minimum length of 10 residues. Please enter a valid Protein Sequence."/>
         <regex match="maximum allowed length" source="both" level="fatal" description="Protein sequence should have a maximum length of 3000 residues. Please enter a valid Protein Sequence."/>
-        <regex match="Failed to fetch" source="both" level="fatal" description="Failed to fetch Galaxy BE version. Please try again."/>
+        <regex match="Failed to fetch" source="both" level="warning" description="Failed to fetch Galaxy BE version."/>
     </stdio>
     <version_command>python '$__tool_directory__/protein_calculator.py' --version</version_command>
     <command detect_errors="exit_code"><![CDATA[
@@ -39,17 +39,16 @@
         --sequence '$sequence'
     #else:
         echo 'Error: Protein sequence is required.' >&2
-        exit 1
     #end if
     ]]></command>
     <inputs>
         <conditional name="fasta_or_text">
             <param name="input_mode" type="select" label="FASTA Input" help="Protein sequence(s) to calculate protein properties of. Input can be a FASTA file from history, or text.">
-                <option value="history">
-                    Use FASTA from history
-                </option>
                 <option value="textbox">
                     Paste sequence into textbox
+                </option>
+                <option value="history">
+                    Use FASTA from history
                 </option>
             </param>
             <when value="history">
