@@ -84,6 +84,16 @@
         </test>
         <test expect_num_outputs="3">
             <conditional name="fasta_or_text">
+                <param name="input_mode" value="history"/>
+                <param name="sequence" value="test_protein.fasta"/>
+                <param name="name" value="ignored_test_name"/>
+            </conditional>
+            <output name="output1" file="crab_anapl_report.html" count="1"/>
+            <output name="output2" file="crab_anapl_plot.png" count="1"/>
+            <output name="output3" file="crab_anapl_interactive_plot.html" count="1"/>
+        </test>
+        <test expect_num_outputs="3">
+            <conditional name="fasta_or_text">
                 <param name="input_mode" value="textbox"/>
                 <param name="name" value="test_name"/>
                 <param name="sequence" value="EASTEREGGEGG"/>
