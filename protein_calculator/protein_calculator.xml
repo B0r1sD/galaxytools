@@ -107,7 +107,7 @@ This Python-based tool will determine protein properties based on the amino acid
 
     .. class:: warningmark
 
-The maximum allowed sequence is set at 3.000 amino acids.
+The maximum allowed sequence is set at 3.000 amino acids. 
 
     .. class:: infomark
 
@@ -117,6 +117,7 @@ The maximum allowed sequence is set at 3.000 amino acids.
 
     - FASTA input file: ``protein_calculator.py [-h] [--name NAME] --fasta /path/to/file.fasta``
 
+        Although FASTA files containing multiple sequences are possible as input, it does not handle wrong sequences well. Make sure to ensure beforehand that all sequences are valid protein sequences.
 
 Arguments:
 
