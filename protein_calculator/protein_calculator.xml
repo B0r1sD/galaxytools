@@ -2,7 +2,7 @@
     <description>by the VIB Protein Core</description>
     <macros>
         <token name="@TOOL_VERSION@">1.1.0</token>
-        <token name="@VERSION_SUFFIX@">0</token>
+        <token name="@VERSION_SUFFIX@">1</token>
     </macros>
     <edam_topics>
         <edam_topic>topic_0123</edam_topic>
