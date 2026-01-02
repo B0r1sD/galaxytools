@@ -57,7 +57,7 @@
             </when>
             <when value="textbox">
                 <param argument="--name" type="text" label="Protein name" help="Name of the protein" optional="false" />
-                <param argument="--sequence" type="text" area="true" label="Protein sequence" help="Sequence to be processed. Protein sequence should have a minimum length of 10 residues. " optional="false"/>
+                <param argument="--sequence" type="text" area="false" label="Protein sequence" help="Sequence to be processed. Protein sequence should have a minimum length of 10 residues. " optional="false" />
             </when>
         </conditional>
     </inputs>
